@@ -36,18 +36,10 @@ cd flowmodoro
 pip install -r requirements.txt
 ```
 
-### 2. Build the app
+### 2. Build and install
 
 ```bash
 bash build_app.sh
-```
-
-The built app will appear in `dist/Flowmodoro.app`.
-
-### 3. Install and launch
-
-```bash
-cp -r dist/Flowmodoro.app /Applications/
 open /Applications/Flowmodoro.app
 ```
 

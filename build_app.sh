@@ -79,6 +79,11 @@ else
   echo "Conda plist already exists, skipping."
 fi
 
+# Move to Applications (avoid duplicate in Spotlight)
+pkill -f Flowmodoro 2>/dev/null
+mv -f dist/Flowmodoro.app /Applications/
+xattr -cr /Applications/Flowmodoro.app
+
 echo ""
-echo "Done. Run:"
-echo "  pkill -f flowmodoro.py 2>/dev/null; cp -r dist/Flowmodoro.app /Applications/ && xattr -cr /Applications/Flowmodoro.app && open /Applications/Flowmodoro.app"
+echo "Done. Installed to /Applications/Flowmodoro.app"
+echo "  open /Applications/Flowmodoro.app"
