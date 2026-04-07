@@ -9,11 +9,12 @@ Work freely until you decide to stop. Your break is earned proportionally:
 
 ## How it works
 
-| State  | Menu bar shows | What you can do              |
-|--------|---------------|------------------------------|
-| Idle   | `🌊 Flow`     | Start Focus                  |
-| Focus  | `▶ 23:14`     | Stop & Take Break            |
-| Break  | `☕ 04:38`    | Skip Break                   |
+| State         | Menu bar shows | What you can do              |
+|---------------|---------------|------------------------------|
+| Idle          | `🌊 Flow`     | Start Focus                  |
+| Focus         | `⏸ 23:14`     | Pause, Stop & Take Break     |
+| Focus (paused)| `▶ 23:14`     | Resume, Stop & Take Break    |
+| Break         | `☕ 04:38`     | Skip Break                   |
 
 - Focus for **50 minutes** → earn a **10-minute** break
 - Focus for **25 minutes** → earn a **5-minute** break

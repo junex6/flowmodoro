@@ -60,15 +60,6 @@ def ask_short_session(on_break, on_continue) -> None:
     threading.Thread(target=_run, daemon=True).start()
 
 
-# ── Menu labels ───────────────────────────────────────────────────────────────
-
-ACTION_LABEL = {
-    "idle":  "▶   Start Focus",
-    "focus": "⏹   Stop & Take Break",
-    "break": "⏭   Skip Break",
-}
-
-
 # ── App ───────────────────────────────────────────────────────────────────────
 
 class FlowmodoroApp(rumps.App):
@@ -77,22 +68,31 @@ class FlowmodoroApp(rumps.App):
         super().__init__(name="Flowmodoro", title="🌊 Flow", quit_button=None)
 
         self.state      = "idle"
+        self.paused     = False
         self.focus_secs = 0
         self.break_secs = 0
         self._asking    = False  # guard: prevent double-dialogs
 
-        self._action = rumps.MenuItem(ACTION_LABEL["idle"], callback=self._on_action)
-        self._quit   = rumps.MenuItem("Quit Flowmodoro",    callback=rumps.quit_application)
-        self.menu    = [self._action, None, self._quit]
+        # Primary action toggles between start, pause/resume, and skip break
+        self._action = rumps.MenuItem("▶   Start Focus", callback=self._on_action)
+
+        # Stop button only visible during focus sessions
+        self._stop = rumps.MenuItem("⏹   Stop & Take Break", callback=self._on_stop)
+
+        self._quit = rumps.MenuItem("Quit Flowmodoro", callback=rumps.quit_application)
+        self.menu = [self._action, self._stop, None, self._quit]
+
+        # Hide stop button until a focus session starts
+        self._stop.hidden = True
 
         rumps.Timer(self._on_tick, 1).start()
 
     # ── Tick ──────────────────────────────────────────────────────────────────
 
     def _on_tick(self, _):
-        if self.state == "focus":
+        if self.state == "focus" and not self.paused:
             self.focus_secs += 1
-            self.title = f"▶ {fmt(self.focus_secs)}"
+            self.title = f"⏸ {fmt(self.focus_secs)}"
 
         elif self.state == "break":
             self.break_secs -= 1
@@ -102,29 +102,47 @@ class FlowmodoroApp(rumps.App):
             else:
                 self.title = f"☕ {fmt(self.break_secs)}"
 
-    # ── Action button ─────────────────────────────────────────────────────────
+    # ── Action button (start / pause / resume / skip) ────────────────────────
 
     def _on_action(self, _):
         if self.state == "idle":
             self.state      = "focus"
+            self.paused     = False
             self.focus_secs = 0
-            self.title      = "▶ 00:00"
-            self._action.title = ACTION_LABEL["focus"]
+            self.title      = "⏸ 00:00"
+            self._action.title = "⏸   Pause"
+            self._stop.hidden = False
 
         elif self.state == "focus":
-            if self._asking:
-                return  # dialog already open, ignore extra clicks
-            if self.focus_secs < MIN_FOCUS:
-                self._asking = True
-                ask_short_session(
-                    on_break=self._do_break,
-                    on_continue=self._do_continue,
-                )
+            if self.paused:
+                # Resume
+                self.paused = False
+                self.title = f"⏸ {fmt(self.focus_secs)}"
+                self._action.title = "⏸   Pause"
             else:
-                self._do_break()
+                # Pause
+                self.paused = True
+                self.title = f"▶ {fmt(self.focus_secs)}"
+                self._action.title = "▶   Resume"
 
         elif self.state == "break":
             self._to_idle()
+
+    # ── Stop button (end focus → take break) ─────────────────────────────────
+
+    def _on_stop(self, _):
+        if self.state != "focus":
+            return
+        if self._asking:
+            return  # dialog already open, ignore extra clicks
+        if self.focus_secs < MIN_FOCUS:
+            self._asking = True
+            ask_short_session(
+                on_break=self._do_break,
+                on_continue=self._do_continue,
+            )
+        else:
+            self._do_break()
 
     # ── Break / continue callbacks ────────────────────────────────────────────
 
@@ -133,22 +151,29 @@ class FlowmodoroApp(rumps.App):
         self.break_secs = self.focus_secs // 5
         notify(f"{fmt(self.focus_secs)} of focus. Break: {fmt(self.break_secs)}.")
         self.state = "break"
+        self.paused = False
         self.title = f"☕ {fmt(self.break_secs)}"
-        self._action.title = ACTION_LABEL["break"]
+        self._action.title = "⏭   Skip Break"
+        self._stop.hidden = True
 
     def _do_continue(self):
         self._asking = False
-        # Timer is already running; nothing else needed.
+        # Unpause so the timer resumes after the dialog
+        self.paused = False
+        self.title = f"⏸ {fmt(self.focus_secs)}"
+        self._action.title = "⏸   Pause"
 
     # ── Reset ─────────────────────────────────────────────────────────────────
 
     def _to_idle(self):
         self.state      = "idle"
+        self.paused     = False
         self.focus_secs = 0
         self.break_secs = 0
         self._asking    = False
         self.title      = "🌊 Flow"
-        self._action.title = ACTION_LABEL["idle"]
+        self._action.title = "▶   Start Focus"
+        self._stop.hidden = True
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
