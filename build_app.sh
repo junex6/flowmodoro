@@ -79,9 +79,11 @@ else
   echo "Conda plist already exists, skipping."
 fi
 
-# Move to Applications (avoid duplicate in Spotlight)
-pkill -f Flowmodoro 2>/dev/null
-mv -f dist/Flowmodoro.app /Applications/
+# Kill running instance, remove old copy, move new one in
+pkill -f Flowmodoro 2>/dev/null || true
+sleep 1
+rm -rf /Applications/Flowmodoro.app
+mv dist/Flowmodoro.app /Applications/
 xattr -cr /Applications/Flowmodoro.app
 
 echo ""

@@ -9,12 +9,41 @@ The short-session dialog runs in a background thread so the
 timer keeps ticking while the user decides.
 """
 
+import os
 import subprocess
+import sys
 import threading
 
 import rumps
 
 MIN_FOCUS = 30  # seconds; below this, ask the user what to do
+
+
+# ── Setup ────────────────────────────────────────────────────────────────────
+
+def ensure_plist() -> None:
+    """
+    Create an Info.plist next to the Python binary if one is missing.
+    rumps needs CFBundleIdentifier to register with the macOS notification
+    center, regardless of whether we're running inside a .app bundle.
+    Without it, conda and Homebrew Python environments crash on the first
+    notification call.
+    """
+    plist_path = os.path.join(os.path.dirname(sys.executable), "Info.plist")
+    if os.path.exists(plist_path):
+        return
+    try:
+        subprocess.run(
+            [
+                "/usr/libexec/PlistBuddy",
+                "-c", 'Add :CFBundleIdentifier string "com.local.flowmodoro"',
+                plist_path,
+            ],
+            check=True,
+            capture_output=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
+        pass  # best-effort; notifications may not work
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -179,4 +208,5 @@ class FlowmodoroApp(rumps.App):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    ensure_plist()
     FlowmodoroApp().run()

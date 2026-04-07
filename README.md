@@ -48,8 +48,9 @@ A `🌊 Flow` icon will appear in your menu bar. Click it to get started.
 To launch on startup, add it to **Login Items** in System Settings →
 General → Login Items.
 
-> **Note on notifications:** macOS may prompt you to allow notifications
-> the first time. Allow them in System Settings → Notifications → Flowmodoro.
+> **Note on notifications:** For pop-up notifications, go to
+> System Settings → Notifications → Flowmodoro and set the style to **Alerts**.
+> The default (Banners) only shows briefly in the notification center.
 
 ---
 
