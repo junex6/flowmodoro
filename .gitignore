@@ -1,0 +1,14 @@
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Icon generation (intermediate files)
+*.iconset/
