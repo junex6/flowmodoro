@@ -21,12 +21,12 @@ Work freely until you decide to stop. Your break is earned proportionally:
 
 ---
 
-## Setup
+## Install
 
 ### Prerequisites
 
 - macOS 10.14+
-- Python 3.8+ (the system Python on macOS is fine; Homebrew Python is better)
+- Python 3.8+
 
 ### 1. Install dependencies
 
@@ -35,28 +35,25 @@ cd flowmodoro
 pip install -r requirements.txt
 ```
 
-### 2. Run directly (for testing)
+### 2. Build the app
 
 ```bash
-python flowmodoro.py
+bash build_app.sh
+```
+
+The built app will appear in `dist/Flowmodoro.app`.
+
+### 3. Install and launch
+
+```bash
+cp -r dist/Flowmodoro.app /Applications/
+open /Applications/Flowmodoro.app
 ```
 
 A `🌊 Flow` icon will appear in your menu bar. Click it to get started.
 
----
-
-## Package as a standalone .app (optional)
-
-If you want to launch it like a normal app (no terminal):
-
-```bash
-pip install py2app
-python setup.py py2app
-```
-
-The built app will appear in `dist/Flowmodoro.app`. Move it to your
-`/Applications` folder. Add it to **Login Items** in System Settings →
-General → Login Items if you want it to launch on startup.
+To launch on startup, add it to **Login Items** in System Settings →
+General → Login Items.
 
 > **Note on notifications:** macOS may prompt you to allow notifications
 > the first time. Allow them in System Settings → Notifications → Flowmodoro.

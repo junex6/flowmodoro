@@ -9,9 +9,10 @@ The short-session dialog runs in a background thread so the
 timer keeps ticking while the user decides.
 """
 
-import rumps
 import subprocess
 import threading
+
+import rumps
 
 MIN_FOCUS = 30  # seconds; below this, ask the user what to do
 

@@ -13,9 +13,6 @@ echo "Building Flowmodoro.app..."
 rm -rf dist
 mkdir -p "${MACOS_DIR}" "${RES_DIR}"
 
-# Generate the wave emoji icon
-echo "Generating app icon..."
-"${PYTHON}" make_icon.py
 cp Flowmodoro.icns "${RES_DIR}/Flowmodoro.icns"
 
 cp flowmodoro.py "${RES_DIR}/flowmodoro.py"
